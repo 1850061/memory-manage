@@ -6,7 +6,6 @@
         dsadsad
       </div>
       <memory-station v-for="item in commandIndex" :key="item.page" :page=item.page :commands="item.commands">
-
       </memory-station>
     </div>
   </div>
@@ -18,15 +17,16 @@ import MemoryStation from "@/components/memoryStation";
 export default {
   name: "memory",
   data() {
-    return {
-
-    }
+    return {}
   },
   props: {
-    commandIndex: Array[{page:String,commands:[Number,Number,Number,Number,Number,Number,Number,Number,Number,Number]}
-    , {page:String,commands:[Number,Number,Number,Number,Number,Number,Number,Number,Number,Number]},
-      {page:String,commands:[Number,Number,Number,Number,Number,Number,Number,Number,Number,Number]},
-      {page:String,commands:[Number,Number,Number,Number,Number,Number,Number,Number,Number,Number]}]
+    commandIndex: Array[{
+      page: String,
+      commands: [Number, Number, Number, Number, Number, Number, Number, Number, Number, Number]
+    }
+        , {page: String, commands: [Number, Number, Number, Number, Number, Number, Number, Number, Number, Number]},
+        {page: String, commands: [Number, Number, Number, Number, Number, Number, Number, Number, Number, Number]},
+        {page: String, commands: [Number, Number, Number, Number, Number, Number, Number, Number, Number, Number]}]
   },
   components: {MemoryStation}
 }
@@ -34,5 +34,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

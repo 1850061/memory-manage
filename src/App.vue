@@ -8,7 +8,7 @@
       <implement ref="implement"></implement>
     </div>
     <div class="flex justify-center mb-8 ...">
-      <a-button class="mx-16 ... " @click="step">单步执行</a-button>
+      <a-button class="mx-16 ... " @click="step(false)">单步执行</a-button>
       <a-button class="mx-16 ... " @click="multStep">连续执行</a-button>
       <a-button class="mx-16 ... " @click="reset">重置</a-button>
     </div>
@@ -42,9 +42,10 @@ export default {
       pageMissingNumber: 0,
       stepCount: 0,
       nowAddress: -1,
-      mulTimeInterval: 510,
+      mulTimeInterval: 400,
       lastClick: 0,
-      isMultStep: 0
+      isMultStep: 0,
+      timer: null
     }
   },
   components: {
@@ -55,7 +56,7 @@ export default {
   },
   methods: {
     step: function (fromMul = false) {
-      if (this.isMultStep === 1 && fromMul === false) {
+      if (this.isMultStep === 1 && fromMul === false && this.stepCount < 320) {
         alert('正在连续执行，不能按该按钮')
         return
       }
@@ -66,7 +67,7 @@ export default {
       }
       if (this.lastClick === 0) {
         this.lastClick = new Date().getTime()
-      } else if ((new Date().getTime() - this.lastClick) < 500) {
+      } else if ((new Date().getTime() - this.lastClick) < 50) {
         return
       } else {
         this.lastClick = new Date().getTime()
@@ -122,12 +123,17 @@ export default {
         alert("指令已执行完毕")
         return;
       }
+      if (this.isMultStep === 1) {
+        this.isMultStep = 0
+        clearInterval(this.timer)
+        return
+      }
       const that = this
       this.isMultStep = 1
-      let timer = setInterval(function () {
+      that.timer = setInterval(function () {
         that.step(true)
         if (that.stepCount >= 320) {
-          clearInterval(timer)
+          clearInterval(that.timer)
           this.isMultStep = 0
           alert("指令已执行完毕")
         }
@@ -137,14 +143,14 @@ export default {
     isInMemory: function () {
       let page = Math.floor(this.nowAddress / 10)
       for (let i = 0; i < this.pages.length; i++) {
-        if (this.pages[i]['page'] === page) {
+        if (this.pages[i]['page'] % 32 === page) {
           return i
         }
       }
       return -1
     },
     reset: function () {
-      if (this.isMultStep === 1) {
+      if (this.isMultStep === 1 && this.stepCount < 320) {
         alert('正在连续执行，不能按该按钮')
         return
       }
@@ -166,6 +172,9 @@ export default {
       let minIndex = -1;
       let minInTime = 1000
       for (let i = 0; i < this.pageInformation.length; i++) {
+        if (this.pageInformation[i]['inTime'] === 0) {
+          continue
+        }
         if (this.pageInformation[i]['inTime'] < minInTime) {
           minInTime = this.pageInformation[i]['inTime']
           minIndex = i
@@ -177,6 +186,9 @@ export default {
       let minIndex = -1;
       let minUseTime = 1000
       for (let i = 0; i < this.pageInformation.length; i++) {
+        if (this.pageInformation[i]['useTime'] === 0) {
+          continue
+        }
         if (this.pageInformation[i]['useTime'] < minUseTime) {
           minUseTime = this.pageInformation[i]['useTime']
           minIndex = i
@@ -213,11 +225,6 @@ export default {
       }
     }
     ,
-    iniPage: function (page) {
-      this.pages[page]['page'] = -1;
-      this.pages[page]['commands'] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-    }
-    ,
     decideNext: function () {
       console.log(this.$refs.information.commandOrderType)
       if (this.$refs.information.commandOrderType === '乱序执行' || this.$refs.information.commandOrderType === 'random') {
@@ -229,7 +236,7 @@ export default {
           } else if (this.stepCount % 4 === 1) {
             this.nowAddress = (Math.floor((Math.random() * this.nowAddress))) % 320;
           } else if (this.stepCount % 4 === 3) {
-            this.nowAddress = (Math.floor((Math.random() * (319 - this.nowAddress)) + this.nowAddress)) % 320;
+            this.nowAddress = (Math.floor((Math.random() * (319 - this.nowAddress)) + this.nowAddress + 1)) % 320;
           }
         }
       } else {
@@ -240,9 +247,9 @@ export default {
     ,
     commandAnimate(page, command) {
       const that = this
-      that.pages[page]['commands'][command] += 10
+      that.pages[page]['commands'][command % 10] += 10
       setTimeout(function () {
-        that.pages[page]['commands'][command] -= 10
+        that.pages[page]['commands'][command % 10] -= 10
       }, that.mulTimeInterval * 0.8);
     }
     ,

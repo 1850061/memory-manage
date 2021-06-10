@@ -3,12 +3,11 @@
     <div class="h-12 flex justify-center items-center text-lg ... ">指令执行情况</div>
     <el-table
         :data="tableData"
-
         highlight-current-row
         @current-change="handleCurrentChange"
         height="360px"
         ref="table"
-        empty-text="暂无已执行过的指令">
+        empty-text="暂无已执行过的指令" class="impl">
       <el-table-column
           prop="index"
           label=""
@@ -71,5 +70,4 @@ export default {
 
 
 <style scoped>
-
 </style>
